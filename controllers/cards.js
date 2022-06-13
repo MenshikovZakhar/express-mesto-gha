@@ -19,7 +19,7 @@ module.exports.createCard = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(VALIDATION_ERROR).send({ message: `Переданы некорректные данные при создании карточки:${err.message}` });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: `Ошибка по умолчанию:${err.message}` });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка по умолчанию.' });
     });
 };
 
@@ -39,7 +39,7 @@ module.exports.deleteCard = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(VALIDATION_ERROR).send({ message: `Переданы некорректные данные для удаления: ${err.message}` });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: `Ошибка по умолчанию: ${err.message}` });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка по умолчанию.' });
     });
 };
 
@@ -62,7 +62,7 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
     if (err.name === 'CastError') {
       return res.status(VALIDATION_ERROR).send({ message: `Передан несуществующий _id карточки: ${err.message}` });
     }
-    return res.status(INTERNAL_SERVER_ERROR).send({ message: `Ошибка по умолчанию: ${err.message}` });
+    return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка по умолчанию.' });
   });
 
 // Убрать лайк
@@ -84,5 +84,5 @@ module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
     if (err.name === 'CastError') {
       return res.status(VALIDATION_ERROR).send({ message: `Передан несуществующий _id карточки: ${err.message}` });
     }
-    return res.status(INTERNAL_SERVER_ERROR).send({ message: `Ошибка по умолчанию: ${err.message}` });
+    return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка по умолчанию.' });
   });

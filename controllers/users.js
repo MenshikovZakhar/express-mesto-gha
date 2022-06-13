@@ -19,9 +19,9 @@ module.exports.getUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(VALIDATION_ERROR).send({ message: `Переданы некорректные данные при создании пользователя: ${err.message}` });
+        return res.status(VALIDATION_ERROR).send({ message: `'Передан некорректный id пользователя': ${err.message}` });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: `Ошибка по умолчанию: ${err.message}` });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка по умолчанию.' });
     });
 };
 
@@ -35,7 +35,7 @@ module.exports.createUser = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(VALIDATION_ERROR).send({ message: `Переданы некорректные данные при создании пользователя: ${err.message}` });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: `Ошибка по умолчанию: ${err.message}` });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка по умолчанию.' });
     });
 };
 
@@ -54,15 +54,19 @@ module.exports.updateUser = (req, res) => {
       upsert: true,
     },
   )
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        res
+          .status(DOCUMENT_NOT_FOUND_ERROR)
+          .send({ message: 'Пользователь по указанному _id не найден' });
+      }
+      res.send(user);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(VALIDATION_ERROR).send({ message: `Переданы некорректные данные при обновлении профиля: ${err.message}` });
       }
-      if (err.name === 'CastError') {
-        return res.status(DOCUMENT_NOT_FOUND_ERROR).send({ message: `Пользователь по указанному _id не найден:${err.message}` });
-      }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: `Ошибка по умолчанию: ${err.message}` });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка по умолчанию.' });
     });
 };
 
@@ -77,14 +81,18 @@ module.exports.updateUserAvatar = (req, res) => {
       upsert: true,
     },
   )
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        res
+          .status(DOCUMENT_NOT_FOUND_ERROR)
+          .send({ message: 'Пользователь по указанному _id не найден' });
+      }
+      res.send(user);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(VALIDATION_ERROR).send({ message: `Переданы некорректные данные при обновлении аватара: ${err.message}` });
       }
-      if (err.name === 'CastError') {
-        return res.status(DOCUMENT_NOT_FOUND_ERROR).send({ message: `Пользователь по указанному _id не найден: ${err.message}` });
-      }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: `Ошибка по умолчанию: ${err.message}` });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка по умолчанию.' });
     });
 };
