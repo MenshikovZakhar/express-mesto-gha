@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Обязательное поле для заполнения'],
     minlength: [2, 'Минимальная длина 2 символа'],
     maxlength: [30, 'Максимальная для 30 символов'],
-    default: 'Жак-Ив Кусто',
+    default: 'Исследователь',
   },
   avatar: {
     type: String,
