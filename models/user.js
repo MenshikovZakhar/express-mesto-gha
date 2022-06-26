@@ -13,12 +13,10 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Обязательное поле для заполнения'],
-    minlength: [8, 'Минимальная длина 8 символов'],
     select: false,
   },
   name: {
     type: String,
-    required: [true, 'Обязательное поле для заполнения'],
     minlength: [2, 'Минимальная длина 2 символа'],
     maxlength: [30, 'Максимальная для 30 символов'],
     default: 'Жак-Ив Кусто',
@@ -33,6 +31,7 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     required: [true, 'Обязательное поле для заполнения'],
+    validate: [validator.isURL, 'Некорректный URL адрес'],
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
 });

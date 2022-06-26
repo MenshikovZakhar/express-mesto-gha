@@ -21,9 +21,9 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadReqError('Введены некорректные данные'));
+        return next(new BadReqError('Введены некорректные данные'));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -37,18 +37,10 @@ module.exports.deleteCard = (req, res, next) => {
       if (card.owner.toString() !== req.user._id) {
         throw new ForbiddenError('Нельзя удалить чужую карточку');
       } else {
-        Card.findByIdAndRemove(req.params.cardId)
-          .then(() => {
-            res.send({ messege: 'Карточка удалена' });
-          });
+        card.remove()
+          .then(() => res.send({ message: 'Карточка удалена' }));
       }
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadReqError('Введены некорректные данные');
-      }
-      next(err);
-    });
+    }).catch(next);
 };
 
 // Поставить лайк карточке

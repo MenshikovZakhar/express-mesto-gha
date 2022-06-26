@@ -34,13 +34,6 @@ module.exports.createUser = (req, res, next) => {
     about,
     avatar,
   } = req.body;
-  User.findOne({ email })
-    .then((user) => {
-      if (user) {
-        throw new ConflictError('Такой пользователь уже зарегистрирован!');
-      }
-    })
-    .catch(next);
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
@@ -60,27 +53,23 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadReqError('Введены некорректные данные'));
-      }
-      if (err.code === 11000) {
+      } else if (err.code === 11000) {
         next(new ConflictError('Такой пользователь уже зарегистрирован!)'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
 // Редактирование данных пользователя
 module.exports.updateUser = (req, res, next) => {
+  const { name, about } = req.body;
   User.findByIdAndUpdate(
-    req.body._id,
-    {
-      name: req.body.name,
-      about: req.body.about,
-      avatar: req.body.avatar,
-    },
+    req.user._id,
+    { name, about },
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .then((user) => {
@@ -91,21 +80,21 @@ module.exports.updateUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadReqError('Введены некорректные данные'));
+        return next(new BadReqError('Введены некорректные данные'));
       }
-      next(err);
+      return next(err);
     });
 };
 
 // Редактирование аватара пользователя
 module.exports.updateUserAvatar = (req, res, next) => {
+  const { avatar } = req.body;
   User.findByIdAndUpdate(
-    req.body._id,
-    { avatar: req.body.avatar },
+    req.user._id,
+    { avatar },
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .then((user) => {
@@ -116,9 +105,9 @@ module.exports.updateUserAvatar = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadReqError('Введены некорректные данные'));
+        return next(new BadReqError('Введены некорректные данные'));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -133,11 +122,7 @@ module.exports.login = (req, res, next) => {
         'secret-key',
         { expiresIn: '7d' },
       );
-      res.cookie('jwt', token, {
-        httpOnly: true,
-        maxAge: 3600000 * 24 * 7,
-      })
-        .send({ token });
+      res.send({ token });
     })
     .catch(() => {
       next(new UnauthorizedError('Ошибка доступа'));
